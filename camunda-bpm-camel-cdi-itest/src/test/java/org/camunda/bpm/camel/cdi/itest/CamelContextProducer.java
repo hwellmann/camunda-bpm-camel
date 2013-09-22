@@ -1,44 +1,35 @@
 package org.camunda.bpm.camel.cdi.itest;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import javax.enterprise.inject.Disposes;
+import javax.enterprise.inject.Produces;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.RoutesBuilder;
-import org.apache.camel.cdi.CdiCamelContext;
-import org.apache.camel.cdi.ContextName;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.camunda.bpm.camel.component.CamundaBpmComponent;
 import org.camunda.bpm.engine.ProcessEngine;
 
-@ApplicationScoped
-public class CamelContextBootstrap {
 
-    @Inject
-    private CdiCamelContext context;
-    
-    @Inject @ContextName("sendToCamel")
-    private RoutesBuilder builder;
-    
-    @Inject
-    private ProcessEngine engine;
+public class CamelContextProducer {
 
-    @PostConstruct
-    public void start() {
-        
+    @Produces @ApplicationScoped
+    public CamelContext camelContext(RouteBuilder routeBuilder, ProcessEngine engine) {
+        DefaultCamelContext context = new DefaultCamelContext(new CdiBeanRegistry());
         CamundaBpmComponent component = new CamundaBpmComponent(engine);
         component.setCamelContext(context);
         context.addComponent("camunda-bpm", component);
         try {
-            context.addRoutes(builder);
+            context.addRoutes(routeBuilder);
             context.start();
         }
         catch (Exception exc) {
             throw new RuntimeException(exc);
         }
-   }
-    
-    public CamelContext getCamelContext() {
         return context;
+    }
+    
+    public void stopContext(@Disposes CamelContext context) throws Exception {
+        context.stop();
     }
 }

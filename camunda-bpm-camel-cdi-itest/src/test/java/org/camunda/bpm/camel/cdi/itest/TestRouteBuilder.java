@@ -1,19 +1,17 @@
 package org.camunda.bpm.camel.cdi.itest;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.cdi.Mock;
 import org.apache.camel.component.mock.MockEndpoint;
 
 @ApplicationScoped
 public class TestRouteBuilder extends RouteBuilder {
 
-    @Inject @Mock
+    //@Inject @Mock
     MockEndpoint resultEndpoint;
 
-    @Inject @Mock
+    //@Inject @Mock
     MockEndpoint receiveEndpoint;
 
     @Override
@@ -21,14 +19,14 @@ public class TestRouteBuilder extends RouteBuilder {
         from("timer://smoke-message?repeatCount=1")
         .routeId("smoke-test-route")
         .to("log:org.camunda.bpm.camel.cdi?level=INFO&showAll=true&multiline=true")
-        .to(resultEndpoint)
+        .to("mock:resultEndpoint")
       ;
 
         
         from("direct:sendToCamelServiceTask")
         .routeId("send-to-camel-route")
         .to("log:org.camunda.bpm.camel.cdi?level=INFO&showAll=true&multiline=true")
-        .to(resultEndpoint)
+        .to("mock:resultEndpoint")
       ;
         
         from("direct:sendToCamundaBpm")
@@ -36,7 +34,7 @@ public class TestRouteBuilder extends RouteBuilder {
         .to("log:org.camunda.bpm.camel.cdi?level=INFO&showAll=true&multiline=true")
         .to("camunda-bpm://signal?processDefinitionKey=receiveFromCamelProcess&activityId=waitForCamel")
         .to("log:org.camunda.bpm.camel.cdi?level=INFO&showAll=true&multiline=true")
-        .to(receiveEndpoint)
+        .to("mock:receiveEndpoint")
       ;
         
     }

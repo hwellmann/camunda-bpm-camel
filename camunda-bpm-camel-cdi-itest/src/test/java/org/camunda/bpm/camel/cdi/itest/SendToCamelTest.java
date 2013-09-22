@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.apache.camel.cdi.Mock;
+import org.apache.camel.CamelContext;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.engine.HistoryService;
@@ -31,10 +31,10 @@ public class SendToCamelTest {
     private HistoryService historyService;
 
     @Inject
-    private CamelContextBootstrap context;
+    private CamelContext context;
 
-    @Inject
-    @Mock
+//    @Inject
+//    @Mock
     MockEndpoint resultEndpoint;
 
     @Test
@@ -43,6 +43,9 @@ public class SendToCamelTest {
         System.out.println(appl.toString());
         System.out.println(context.toString());
 
+        resultEndpoint = context.getEndpoint("mock:resultEndpoint", MockEndpoint.class);
+
+        
         Map<String, Object> processVariables = new HashMap<String, Object>();
         processVariables.put("var1", "foo");
         processVariables.put("var2", "bar");

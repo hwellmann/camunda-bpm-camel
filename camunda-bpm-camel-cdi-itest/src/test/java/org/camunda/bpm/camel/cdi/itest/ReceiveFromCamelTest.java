@@ -8,8 +8,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.cdi.Mock;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.engine.HistoryService;
@@ -32,11 +32,11 @@ public class ReceiveFromCamelTest {
   private HistoryService historyService;
   
   @Inject
-  private CamelContextBootstrap context;
+  private CamelContext context;
   
 
-  @Inject
-  @Mock
+//  @Inject
+//  @Mock
   MockEndpoint receiveEndpoint;
 
   @Test
@@ -44,6 +44,8 @@ public class ReceiveFromCamelTest {
       
       System.out.println(appl.toString());
       System.out.println(context.toString());
+      
+      receiveEndpoint = context.getEndpoint("mock:receiveEndpoint", MockEndpoint.class);
 
       Map<String, Object> processVariables = new HashMap<String, Object>();
       processVariables.put("var1", "foo");
@@ -60,7 +62,7 @@ public class ReceiveFromCamelTest {
        * FIXME: we need to fix this with the process execution id or even better with the Activity Instance Model
        * http://camundabpm.blogspot.de/2013/06/introducing-activity-instance-model-to.html
        */
-      ProducerTemplate tpl = context.getCamelContext().createProducerTemplate();
+      ProducerTemplate tpl = context.createProducerTemplate();
       tpl.sendBodyAndProperty("direct:sendToCamundaBpm", null, CAMUNDA_BPM_PROCESS_INSTANCE_ID, processInstance.getId());
 
       // Assert that the camunda BPM process instance ID has been added as a property to the message
