@@ -15,7 +15,7 @@ public class CamelContextProducer {
 
     @Produces @ApplicationScoped
     public CamelContext camelContext(RouteBuilder routeBuilder, ProcessEngine engine) {
-        DefaultCamelContext context = new DefaultCamelContext(new CdiBeanRegistry());
+        DefaultCamelContext context = new DefaultCamelContext();
         CamundaBpmComponent component = new CamundaBpmComponent(engine);
         component.setCamelContext(context);
         context.addComponent("camunda-bpm", component);
