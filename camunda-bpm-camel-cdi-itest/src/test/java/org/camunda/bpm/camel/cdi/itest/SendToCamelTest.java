@@ -10,10 +10,10 @@ import javax.inject.Inject;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -22,7 +22,8 @@ import org.ops4j.pax.exam.junit.PaxExam;
 public class SendToCamelTest {
 
     @Inject
-    private ProcessApplicationInterface appl;
+    @Rule
+    public BootstrapRule bootstrap;
 
     @Inject
     private RuntimeService runtimeService;
@@ -33,19 +34,13 @@ public class SendToCamelTest {
     @Inject
     private CamelContext context;
 
-//    @Inject
-//    @Mock
-    MockEndpoint resultEndpoint;
+    private MockEndpoint resultEndpoint;
 
     @Test
     public void doTest() throws InterruptedException {
 
-        System.out.println(appl.toString());
-        System.out.println(context.toString());
-
         resultEndpoint = context.getEndpoint("mock:resultEndpoint", MockEndpoint.class);
 
-        
         Map<String, Object> processVariables = new HashMap<String, Object>();
         processVariables.put("var1", "foo");
         processVariables.put("var2", "bar");
